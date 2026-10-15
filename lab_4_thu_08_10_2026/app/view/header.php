@@ -7,6 +7,7 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            color: #333;
         }
         table {
             width: 100%;
@@ -29,13 +30,33 @@
             color: #00ff00;
             margin-bottom: 15px;
         }
-        .btn {
-            padding: 5px 10px;
+        button, .btn {
+            display: inline-block;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 6px 12px;
             text-decoration: none;
             border: 1px solid #ccc;
             background-color: #eee;
             color: #333;
             margin-right: 5px;
+            cursor: pointer;
+            vertical-align: middle;
+            box-sizing: border-box;
+            border-radius: 3px;
+        }
+        button:hover, .btn:hover {
+            background-color: #ddd;
+        }
+        input[type="text"] {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            padding: 6px 8px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 320px;
+            box-sizing: border-box;
         }
         nav {
             margin-bottom: 20px;

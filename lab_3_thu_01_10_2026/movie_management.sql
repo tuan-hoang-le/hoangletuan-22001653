@@ -1,8 +1,8 @@
 -- 1. Create the database.
-CREATE DATABASE IF NOT EXISTS web_applications_development_sem_i_2026_2027_lab_3_movie;
+CREATE DATABASE IF NOT EXISTS movie;
 
 -- Switch to the newly created database.
-USE web_applications_development_sem_i_2026_2027_lab_3_movie;
+USE movie;
 
 -- 1. Create table movies.
 CREATE TABLE movies (

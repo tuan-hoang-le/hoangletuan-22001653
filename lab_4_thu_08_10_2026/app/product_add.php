@@ -3,30 +3,28 @@ require_once 'model/product.php';
 
 $errors = [];
 $successMessage = '';
+$name = '';
+$price = '';
+$quantity = '';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = trim($_POST['name'] ?? '');
     $price = trim($_POST['price'] ?? '');
     $quantity = trim($_POST['quantity'] ?? '');
-
-    if (empty($name)) {
-        $errors[] = "Product name cannot be empty.";
-    }
-
-    if (!is_numeric($price) || $price <= 0) {
-        $errors[] = "Price must be a number greater than 0.";
-    }
-
-    if (!is_numeric($quantity) || $quantity < 0) {
-        $errors[] = "Quantity must be greater than or equal to 0.";
-    }
+    $errors = validateProductInput($name, $price, $quantity);
 
     if (empty($errors)) {
-        if (addProduct($name, (float) $price, (int) $quantity)) {
-            $successMessage = "Product added successfully.";
-            $name = $price = $quantity = '';
-        } else {
-            $errors[] = "Failed to add the product. Please try again later.";
+        try {
+            if (addProduct($name, (float) $price, (int) $quantity)) {
+                $successMessage = "Product added successfully.";
+                $name = '';
+                $price = '';
+                $quantity = '';
+            } else {
+                $errors[] = "Failed to add the product. Please try again later.";
+            }
+        } catch (Exception $e) {
+            $errors[] = "An unexpected error occurred: " . $e->getMessage();
         }
     }
 }
@@ -36,7 +34,7 @@ include 'view/header.php';
 
 <h2>Add product</h2>
 
-<?php if (!empty($error)): ?>
+<?php if (!empty($errors)): ?>
     <div class="error">
         <ul>
             <?php foreach ($errors as $error): ?>
@@ -53,18 +51,19 @@ include 'view/header.php';
 <form method="post" action="">
     <p>
         <label for="name">Product name:</label><br>
-        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name ?? ''); ?>">
+        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($name); ?>">
     </p>
     <p>
         <label for="price">Price:</label><br>
-        <input type="text" id="price" name="price" value="<?php echo htmlspecialchars($price ?? ''); ?>">
+        <input type="text" id="price" name="price" value="<?php echo htmlspecialchars($price); ?>">
     </p>
     <p>
         <label for="quantity">Quantity:</label><br>
-        <input type="text" id="quantity" name="quantity" value="<?php echo htmlspecialchars($quantity ?? ''); ?>">
+        <input type="text" id="quantity" name="quantity" value="<?php echo htmlspecialchars($quantity); ?>">
     </p>
     <p>
-        <button type="submit">Add product</button>
+        <button type="submit" class="btn">Add product</button>
+        <a href="product_list.php" class="btn">Cancel</a>
     </p>
 </form>
 
