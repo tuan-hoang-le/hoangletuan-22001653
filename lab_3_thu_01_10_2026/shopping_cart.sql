@@ -1,8 +1,8 @@
 -- 1. Create the database.
-CREATE DATABASE IF NOT EXISTS web_applications_development_sem_i_2026_2027_lab_3_shopping_cart;
+CREATE DATABASE IF NOT EXISTS shopping_cart;
 
 -- Switch to the newly created database.
-USE web_applications_development_sem_i_2026_2027_lab_3_shopping_cart;
+USE shopping_cart;
 
 -- Create table cart_items.
 CREATE TABLE cart_items (

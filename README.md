@@ -19,7 +19,7 @@ root
     │   │   ├── config.php        # Định nghĩa các hằng số cấu hình kết nối cơ sở dữ liệu và tên bảng.
     │   │   └── dbConnect.php     # Khởi tạo kết nối PHP với MySQL (MySQLi) và xử lý lỗi kết nối.
     │   ├── model/
-    │   │   └── product.php       # Tầng Model: Hiện thực các hàm xử lý dữ liệu (CRUD) cho sản phẩm.
+    │   │   └── product.php       # Tầng model: Hiện thực các hàm xử lý dữ liệu (CRUD) cho sản phẩm.
     │   ├── view/
     │   │   ├── footer.php        # Giao diện chân trang (footer).
     │   │   └── header.php        # Giao diện đầu trang (header) gồm menu điều hướng và CSS cơ bản.
