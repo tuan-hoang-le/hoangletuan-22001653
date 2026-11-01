@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal task manager</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="assets/css/personal_task_manager.css">
+
+    <!-- Load local Vue.js with CDN fallback to ensure offline and online reliability -->
+    <script src="assets/js/vue.global.js"></script>
+    <script>
+        if (!window.Vue) {
+            document.write('<script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <main id="app" class="app-layout">
+        <section class="task-card" aria-label="Personal daily task manager">
+            <!-- Header section: Application title and live metric counters -->
+            <header class="task-card__header">
+                <div class="header-titles">
+                    <span class="badge badge--pill">Kế hoạch trong ngày</span>
+                    <h1 class="task-card__title">Quản lý công việc</h1>
+                </div>
+
+                <div class="metrics-row" aria-label="Task metrics summary">
+                    <div class="metric-pill">
+                        <span class="metric-label">Tổng số:</span>
+                        <strong class="metric-value">{{ totalTasksCount }}</strong>
+                    </div>
+                    <div class="metric-pill metric-pill--highlight">
+                        <span class="metric-label">Chưa xong:</span>
+                        <strong class="metric-value">{{ pendingTasksCount }}</strong>
+                    </div>
+                </div>
+            </header>
+
+            <form class="task-input-bar" @submit.prevent="handleAddTask">
+                <input type="text"
+                       class="form-input"
+                       placeholder="Nhập tên công việc cần làm... (Nhấn Enter hoặc Thêm)"
+                       v-model.trim="newTaskTitle"
+                       aria-label="New task title">
+
+                <button type="submit"
+                        class="btn btn--primary"
+                        :disabled="!isInputValid"
+                        title="Thêm công việc vào danh sách">
+                    Thêm
+                </button>
+            </form>
+
+            <nav class="filter-tabs" aria-label="Filter tasks">
+                <button v-for="filter in filterList"
+                        :key="filter.key"
+                        type="button"
+                        class="filter-tab-btn"
+                        :class="{ 'filter-tab-btn--active': currentFilter === filter.key }"
+                        @click="setFilter(filter.key)">
+                    <span>{{ filter.label }}</span>
+                    <span class="filter-count">{{ getFilterCount(filter.key) }}</span>
+                </button>
+            </nav>
+
+            <!-- ===== TASK LIST SECTION ===== -->
+            <div class="task-list-wrapper">
+                <ul class="task-list" v-if="filteredTasks.length > 0">
+                    <li v-for="task in filteredTasks"
+                        :key="task.id"
+                        class="task-item"
+                        :class="{ 'task-item--completed': task.completed }">
+
+                        <label class="task-checkbox-label">
+                            <input type="checkbox"
+                                   class="task-checkbox"
+                                   v-model="task.completed">
+                            <span class="custom-checkbox" aria-hidden="true"></span>
+                            <span class="task-title">{{ task.title }}</span>
+                        </label>
+
+                        <button type="button"
+                                class="btn-delete"
+                                @click="deleteTask(task.id)"
+                                :title="'Xóa công việc: ' + task.title"
+                                aria-label="Delete task">
+                            ✕
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="empty-state" v-else role="status" aria-live="polite">
+                    <div class="empty-state__icon">📋</div>
+                    <p class="empty-state__message">{{ emptyStateMessage }}</p>
+                </div>
+            </div>
+
+            <!-- Footer: Actions and bulk operations -->
+            <footer class="task-card__footer">
+                <span class="footer-hint">
+                    Đã hoàn thành: <strong>{{ completedTasksCount }}</strong>
+                </span>
+
+                <button type="button"
+                        class="btn btn--danger-outline"
+                        @click="clearCompletedTasks"
+                        :disabled="completedTasksCount === 0">
+                    Xóa các việc đã hoàn thành
+                </button>
+            </footer>
+        </section>
+    </main>
+
+    <!-- Application script -->
+    <script src="assets/js/personal_task_manager.js"></script>
+</body>
+</html>

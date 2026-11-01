@@ -1,0 +1,472 @@
+:root {
+    /* Color palette */
+    --color-primary: #dc2626;
+    --color-primary-hover: #b91c1c;
+    --color-primary-subtle: #fef2f2;
+    --color-bg-page: #0f172a;
+    --color-surface: #1e293b;
+    --color-surface-card: #243044;
+    --color-text-main: #f8fafc;
+    --color-text-muted: #94a3b8;
+    --color-border: #334155;
+    --color-success: #22c55e;
+    --color-success-bg: rgba(34, 197, 94, 0.15);
+
+    /* Typography and spacing */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --shadow-card: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    --transition-fast: 0.2s ease-in-out;
+}
+
+/* Base reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg-page);
+    color: var(--color-text-main);
+    line-height: 1.5;
+    padding: 40px 20px;
+}
+
+.booking-container {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 32px;
+    align-items: flex-start;
+}
+
+@media (max-width: 868px) {
+    .booking-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== FORM CARD STYLES ===== */
+.booking-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+}
+
+.booking-card__header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 16px;
+}
+
+.badge--cinema {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: var(--color-primary);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.booking-card__title {
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.booking-card__subtitle {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+}
+
+/* Form controls */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #e2e8f0;
+}
+
+.required {
+    color: var(--color-primary);
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 11px 14px;
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-main);
+    font-size: 0.95rem;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.25);
+}
+
+.form-hint {
+    display: block;
+    font-size: 0.8rem;
+    color: #f87171;
+    margin-top: 6px;
+}
+
+/* Ticket option radio cards */
+.ticket-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ticket-option-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.ticket-option-card:hover {
+    border-color: #64748b;
+    background-color: #2b3952;
+}
+
+.ticket-option-card--active {
+    border-color: var(--color-primary);
+    background-color: rgba(220, 38, 38, 0.1);
+}
+
+.ticket-option-card__name {
+    display: block;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.ticket-option-card__desc {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.ticket-option-card__price {
+    font-weight: 700;
+    color: #fca5a5;
+    font-size: 1rem;
+}
+
+/* Stepping input */
+.stepper-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 200px;
+}
+
+.btn-stepper {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-main);
+    font-size: 1.25rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-stepper:hover:not(:disabled) {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-stepper:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.form-input--number {
+    text-align: center;
+    font-weight: 700;
+}
+
+/* Combo card */
+.combo-checkbox-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background-color: var(--color-surface-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.combo-checkbox-card--checked {
+    border-color: #eab308;
+    background-color: rgba(234, 179, 8, 0.1);
+}
+
+.form_checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--color-primary);
+    margin-top: 3px;
+    cursor: pointer;
+}
+
+.combo-checkbox-card__body {
+    flex: 1;
+}
+
+.combo-checkbox-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.combo-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.combo-price {
+    font-weight: 700;
+    color: #fde047;
+}
+
+.combo-desc {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+/* Actions */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: none;
+}
+
+.btn--primary {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.btn--primary:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.4);
+}
+
+.btn--primary:disabled {
+    background-color: #475569;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn--outline {
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+}
+
+.btn--outline:hover {
+    background-color: var(--color-surface-card);
+    color: var(--color-text-main);
+}
+
+/* ===== SUMMARY AND RECEIPT STYLES ===== */
+.summary-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.summary-card {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+}
+
+.summary-card__title {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.summary-row span:last-child {
+    color: var(--color-text-main);
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px dashed var(--color-border);
+    margin: 16px 0;
+}
+
+.summary-row--total {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    align-items: center;
+}
+
+.total-price {
+    color: #f87171;
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+/* Confirmation receipt */
+.receipt-card {
+    background: linear-gradient(145deg, #1e293b, #1e3a5f);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    border: 2px dashed var(--color-success);
+    box-shadow: var(--shadow-card);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.receipt-card__badge {
+    display: inline-block;
+    background-color: var(--color-success-bg);
+    color: var(--color-success);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    margin-bottom: 10px;
+}
+
+.receipt-card__title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.receipt-list {
+    list-style: none;
+    font-size: 0.875rem;
+}
+
+.receipt-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.receipt-label {
+    color: var(--color-text-muted);
+}
+
+.receipt-value {
+    color: var(--color-text-main);
+}
+
+.receipt-total-row {
+    margin-top: 8px;
+    padding-top: 12px !important;
+    border-bottom: none !important;
+}
+
+.receipt-total {
+    color: #4ade80;
+    font-size: 1.15rem;
+}
+
+.btn-close-receipt {
+    width: 100%;
+    margin-top: 16px;
+    padding: 8px;
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-close-receipt:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--color-text-main);
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
