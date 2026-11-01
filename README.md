@@ -49,6 +49,20 @@ root
 │   │   ├── product_list.php      # Giao diện bảng danh sách sản phẩm cùng các chức năng sửa, xóa (chỉ cho phép người dùng đã đăng nhập).
 │   │   └── register.php          # Giao diện form và xử lý đăng ký tài khoản mới, mã hóa mật khẩu bằng password_hash() trước khi lưu vào CSDL.
 │   └── shopping_cart.sql         # Kịch bản SQL tạo cơ sở dữ liệu, các bảng products, users và chèn các bản ghi mẫu.
+├── lab_6_thu_29_10_2026/
+│   ├── assets/
+│   │   ├── css/
+│   │   │   ├── movie_ticket_booking.css  # Định dạng giao diện cho bài 2: Bố cục rạp phim tối, tương phản cao và hiệu ứng tương tác.
+│   │   │   ├── personal_task_manager.css # Định dạng giao diện cho bài 3: Bố cục danh sách công việc tối giản, trực quan, hỗ trợ gạch ngang và bộ đếm.
+│   │   │   └── student_info_card.css     # Định dạng giao diện cho bài 1: Thẻ thông tin sinh viên, huy hiệu xếp loại theo điểm và bảng điều khiển thử nghiệm.
+│   │   └── js/
+│   │       ├── movie_ticket_booking.js   # Xử lý logic Vue.js cho bài 2: Tính tổng tiền, chọn loại vé, suất chiếu, combo và xuất vé điện tử.
+│   │       ├── personal_task_manager.js  # Xử lý logic Vue.js cho bài 3: Thêm, xóa, đánh dấu hoàn thành, lọc theo trạng thái và thống kê số lượng công việc.
+│   │       ├── student_info_card.js      # Xử lý logic Vue.js cho bài 1: Xếp loại học lực theo thang điểm, đổi màu huy hiệu và bật/tắt phần giới thiệu.
+│   │       └── vue.global.js             # Thư viện Vue.js 3 bản độc lập (global build) phục vụ chạy ngoại tuyến (offline).
+│   ├── movie_ticket_booking.html         # Giao diện bài 2: Ứng dụng đặt vé xem phim với Vue.js (v-model, modifiers, computed, @submit.prevent).
+│   ├── personal_task_manager.html        # Giao diện bài 3: Ứng dụng quản lý công việc cá nhân với Vue.js (v-for, :key, checkbox, bộ lọc trạng thái).
+│   └── student_info_card.html            # Giao diện bài 1: Thẻ thông tin sinh viên với Vue.js (createApp, data, v-text, v-bind, v-if, v-show).
 └── midterm/
     ├── problem_1_student_grading.php # Giải quyết bài 1 trong đề thi giữa kỳ: Xếp loại học lực học sinh theo thang điểm bằng class Student và câu lệnh điều kiện.
     └── problem_2_product_pricing.php # Giải quyết bài 2 trong đề thi giữa kỳ: Quản lý mảng giá sản phẩm, tính tổng giá trị và tìm giá cao nhất bằng class ProductPriceManager.

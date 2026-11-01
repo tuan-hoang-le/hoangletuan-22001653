@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie ticket booking</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="assets/css/movie_ticket_booking.css">
+
+    <!-- Load local Vue.js with CDN fallback to ensure offline and online reliability -->
+    <script src="assets/js/vue.global.js"></script>
+    <script>
+        if (!window.Vue) {
+            document.write('<script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <main id="app" class="booking-container">
+        <!-- ===== LEFT COLUMN: BOOKING FORM ===== -->
+        <section class="booking-card" aria-label="Movie ticket booking form">
+            <header class="booking-card__header">
+                <span class="badge badge--cinema">CINESTAR MULTIPLEX</span>
+                <h1 class="booking-card__title">Đặt vé xem phim</h1>
+                <p class="booking-card__subtitle">Phim: Kẻ trộm mặt trăng (2D / 3D)</p>
+            </header>
+
+            <form class="booking-form" @submit.prevent="handleBookingSubmit">
+                <div class="form-group">
+                    <label for="customer-name" class="form-label">
+                        Họ và tên khách hàng <span class="required">*</span>
+                    </label>
+                    <input id="customer-name"
+                           type="text"
+                           class="form-input"
+                           placeholder="Ví dụ: Nguyễn Văn An"
+                           v-model.trim="form.customerName">
+                    <small class="form-hint" v-if="!isCustomerNameValid && form.customerName.length > 0">
+                        Vui lòng không để trống tên.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="showtime-select" class="form-label">
+                        Chọn suất chiều <span class="required">*</span>
+                    </label>
+                    <div class="select-wrapper">
+                        <select id="showtime-select" class="form-select" v-model="form.selectedShowtimeId">
+                            <option v-for="show in showtimes" :key="show.id" :value="show.id">
+                                {{ show.time }} - {{ show.room }} ({{ show.format }})
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Chọn loại vé <span class="required">*</span></label>
+                    <div class="ticket-radio-group">
+                        <label v-for="ticket in ticketTypes"
+                               :key="ticket.id"
+                               class="ticket-option-card"
+                               :class="{ 'ticket-option-card--active': form.selectedTicketTypeId === ticket.id }">
+                            <input type="radio"
+                                   name="ticketType"
+                                   :value="ticket.id"
+                                   v-model="form.selectedTicketTypeId"
+                                   class="sr-only">
+                            <div class="ticket-option-card__content">
+                                <span class="ticket-option-card__name">{{ ticket.name }}</span>
+                                <span class="ticket-option-card__desc">{{ ticket.description }}</span>
+                            </div>
+                            <span class="ticket-option-card__price">{{ formatCurrency(ticket.price) }}</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ticket-quantity" class="form-label">
+                        Số lượng vé (1 - 10) <span class="required">*</span>
+                    </label>
+                    <div class="stepper-input">
+                        <!-- Decrement button -->
+                        <button type="button"
+                                class="btn-stepper"
+                                @click="decreaseQuantity"
+                                :disabled="form.ticketQuantity <= quantityLimits.MIN"
+                                aria-label="Decrease quantity">
+                            -
+                        </button>
+
+                        <!-- Number input with v-model.number -->
+                        <input id="ticket-quantity"
+                               type="number"
+                               class="form-input form-input--number"
+                               :min="quantityLimits.MIN"
+                               :max="quantityLimits.MAX"
+                               v-model.number="form.ticketQuantity">
+
+                        <!-- Increment button -->
+                        <button type="button"
+                                class="btn-stepper"
+                                @click="increaseQuantity"
+                                :disabled="form.ticketQuantity >= quantityLimits.MAX"
+                                aria-label="Increase quantity">
+                            +
+                        </button>
+                    </div>
+                    <small class="form-hint" v-if="!isQuantityValid">
+                        Số lượng vé hợp lệ phải là số nguyên từ {{ quantityLimits.MIN }} đến {{ quantityLimits.MAX }}.
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label class="combo-checkbox-card" :class="{ 'combo-checkbox-card--checked': form.hasCombo }">
+                        <input type="checkbox" v-model="form.hasCombo" class="form-checkbox">
+                        <div class="combo-checkbox-card__body">
+                            <div class="combo-checkbox-card__header">
+                                <span class="combo-name">{{ comboConfig.name }}</span>
+                                <span class="combo-price">+{{ formatCurrency(comboConfig.price) }}</span>
+                            </div>
+                            <p class="combo-desc">{{ comboConfig.description }}</p>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn--outline" @click="resetBookingForm">
+                        Đặt lại form
+                    </button>
+                    <button type="submit"
+                            class="btn btn--primary"
+                            :disabled="!isFormValid"
+                            :title="!isFormValid ? 'Vui lòng nhập họ tên và số lượng vé hợp lệ' : 'Nhấn để hoàn tất đặt vé'">
+                        Đặt vé ngay
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- ===== RIGHT COLUMN: LIVE SUMMARY AND RECEIPT ===== -->
+        <aside class="summary-wrapper" aria-label="Booking summary and confirmation">
+            <div class="summary-card">
+                <h2 class="summary-card__title">Chi tiết đơn vé</h2>
+
+                <div class="summary-row">
+                    <span>Loại vé:</span>
+                    <span class="font-semibold">{{ currentTicketType.name }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Đơn giá vé:</span>
+                    <span>{{ formatCurrency(currentTicketType.price) }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Số lượng:</span>
+                    <span>x {{ isQuantityValid ? form.ticketQuantity : 0 }}</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Tiền vé:</span>
+                    <span class="font-semibold">{{ formatCurrency(ticketSubtotal) }}</span>
+                </div>
+
+                <div class="summary-row" v-if="form.hasCombo">
+                    <span>{{ comboConfig.name }}:</span>
+                    <span class="font-semibold">+{{ formatCurrency(comboConfig.price) }}</span>
+                </div>
+
+                <hr class="summary-divider">
+
+                <div class="summary-row summary-row--total">
+                    <span>Tổng thanh toán:</span>
+                    <span class="total-price">{{ formatCurrency(totalPrice) }}</span>
+                </div>
+            </div>
+
+            <article class="receipt-card" v-if="confirmedBooking" aria-live="polite">
+                <div class="receipt-card__badge">✓ Đặt vé thành công</div>
+                <h3 class="receipt-card__title">Vé điện tử (e-ticket)</h3>
+
+                <ul class="receipt-list">
+                    <li>
+                        <span class="receipt-label">Khách hàng:</span>
+                        <strong class="receipt-value">{{ confirmedBooking.customerName }}</strong>
+                    </li>
+                    <li>
+                        <span class="receipt-label">Suất chiều:</span>
+                        <span class="receipt-value">{{ confirmedBooking.showtimeText }}</span>
+                    </li>
+                    <li>
+                        <span class="receipt-label">Loại vé:</span>
+                        <span class="receipt-value">{{ confirmedBooking.ticketTypeName }} (x{{ confirmedBooking.quantity }})</span>
+                    </li>
+                    <li>
+                        <span class="receipt-label">Combo bắp nước:</span>
+                        <span class="receipt-value">{{ confirmedBooking.hasCombo ? 'Có (1 phần)' : 'Không' }}</span>
+                    </li>
+                    <li>
+                        <span class="receipt-label">Thời gian đặt:</span>
+                        <span class="receipt-value">{{ confirmedBooking.bookedAt }}</span>
+                    </li>
+                    <li class="receipt-total-row">
+                        <span class="receipt-label">Tổng tiền đã thanh toán:</span>
+                        <strong class="receipt-total">{{ formatCurrency(confirmedBooking.totalAmount) }}</strong>
+                    </li>
+                </ul>
+            </article>
+        </aside>
+    </main>
+
+    <!-- Application script -->
+    <script src="assets/js/movie_ticket_booking.js"></script>
+</body>
+</html>

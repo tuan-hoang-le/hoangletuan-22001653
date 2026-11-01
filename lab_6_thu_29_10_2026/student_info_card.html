@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student information card</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="assets/css/student_info_card.css">
+
+    <!-- Load local Vue.js with CDN fallback to ensure offline and online reliability -->
+    <script src="assets/js/vue.global.js"></script>
+    <script>
+        if (!window.Vue) {
+            document.write('<script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>')
+        }
+    </script>
+</head>
+<body>
+    <main id="app" class="layout-container">
+        <!-- ===== STUDENT PROFILE CARD ===== -->
+        <article class="student-card" aria-label="Student information card">
+            <!-- Header section: Avatar, full name and student ID -->
+            <header class="student-card__header">
+                <figure class="student-card__avatar-box">
+                    <img :src="student.avatarUrl"
+                         :alt="student.avatarAlt"
+                         class="student-card__avatar"
+                         @error="handleAvatarFallback">
+                </figure>
+
+                <h1 class="student-card__name">{{ student.fullName }}</h1>
+                <p class="student-card__code">MSSV: {{ student.studentId }}</p>
+            </header>
+
+            <!-- Body section: Academic metrics -->
+            <section class="student-card__body">
+                <div class="info-row">
+                    <span class="info-row__label">Lớp sinh hoạt:</span>
+                    <span class="info-row__value font-medium" v-text="student.className"></span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-row__label">Điểm trung bình:</span>
+                    <span class="info-row__value font-bold">{{ student.gpa.toFixed(1) }}</span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-row__label">Xếp loại:</span>
+                    <span class="badge" :class="getAcademicRank().badgeClass">
+                        {{ getAcademicRank().label }}
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <span class="info-row__label">Tình trạng:</span>
+                    <span v-if="student.isEnrolled" class="badge badge--success">
+                        {{ statusConfig.ACTIVE.label }}
+                    </span>
+                    <span v-else class="badge badge--danger">
+                        {{ statusConfig.WITHDRAWN.label }}
+                    </span>
+                </div>
+
+                <div class="bio-accordion">
+                    <button type="button"
+                            class="btn-toggle"
+                            @click="toggleBioVisibility"
+                            :aria-expanded="isBioVisible">
+                        <span>{{ isBioVisible ? 'Thu gọn phần giới thiệu' : 'Xem thêm giới thiệu' }}</span>
+                        <span class="btn-toggle__icon">{{ isBioVisible ? '▲' : '▼' }}</span>
+                    </button>
+
+                    <div class="bio-accordion__content" v-show="isBioVisible">
+                        <p>{{ student.bio }}</p>
+                    </div>
+                </div>
+            </section>
+        </article>
+
+        <!-- ===== LIVE REACTIVE SANDBOX ===== -->
+        <!-- Allow real-time evaluation of UI updates without reloading the page -->
+        <aside class="control-panel" aria-label="Live testing panel">
+            <header class="control-panel__header">
+                <h2>Bảng thử nghiệm tương tác</h2>
+                <p class="control-panel__subtitle">Kiểm tra tính phản ứng dữ liệu</p>
+            </header>
+
+            <form class="control-form" @submit.prevent>
+                <div class="form-group">
+                    <label for="input-name">Họ và tên:</label>
+                    <input id="input-name" type="text" class="form-input" v-model.trim="student.fullName">
+                </div>
+
+                <div class="form-group">
+                    <label for="input-class">Lớp:</label>
+                    <input id="input-class" type="text" class="form-input" v-model.trim="student.className">
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label-row">
+                        <label for="input-gpa">Điểm trung bình:</label>
+                        <span class="gpa-live-value">{{ student.gpa.toFixed(1) }}</span>
+                    </div>
+                    <input id="input-gpa"
+                           type="range"
+                           class="form-range"
+                           min="0"
+                           max="10"
+                           step="0.1"
+                           v-model.number="student.gpa">
+                </div>
+
+                <div class="form-group">
+                    <label for="input-status">Trạng thái học tập:</label>
+                    <select id="input-status" class="form-select" v-model="student.isEnrolled">
+                        <option :value="true">Đang học</option>
+                        <option :value="false">Đã nghỉ</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-avatar">URL ảnh đại diện:</label>
+                    <input id="input-avatar" type="url" class="form-input" v-model.lazy="student.avatarUrl">
+                </div>
+
+                <button type="button" class="btn-reset" @click="resetToDefaultData">
+                    Khôi phục dữ liệu ban đầu
+                </button>
+            </form>
+        </aside>
+    </main>
+
+    <!-- Application script -->
+    <script src="assets/js/student_info_card.js"></script>
+</body>
+</html>
