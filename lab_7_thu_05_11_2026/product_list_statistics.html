@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product list with search and statistics</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="assets/css/product_list_statistics.css">
+
+    <!-- Load local Vue.js with CDN fallback for offline/online reliability -->
+    <script src="assets/js/vue.global.js"></script>
+    <script>
+        if (!window.Vue) {
+            document.write('<script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <div id="app" class="dashboard-layout">
+        <!-- ===== TOP HEADER & SYSTEM STATUS ===== -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="header-title">Quản lý kho hàng và sản phẩm</h1>
+                <p class="header-subtitle">Hệ thống theo dõi tồn kho, tìm kiếm và thống kê thời gian thực</p>
+            </div>
+
+            <div class="status-indicator" :class="{ 'status-indicator--ready': isPageReady }">
+                <span class="status-indicator__dot"></span>
+                <span class="status-indicator__text">Trạng thái: <strong>{{ pageStatus }}</strong></span>
+            </div>
+        </header>
+
+        <!-- ===== STATISTIC METRIC CARDS ===== -->
+        <section class="metrics-grid" aria-label="Inventory metrics">
+            <div class="metric-card">
+                <div class="metric-card__icon">📦</div>
+                <div class="metric-card__info">
+                    <span class="metric-card__label">Sản phẩm đang hiển thị</span>
+                    <strong class="metric-card__value">
+                        {{ displayedProductsCount }} <span class="metric-card__sub">/ {{ totalProductsCount }} sản phẩm</span>
+                    </strong>
+                </div>
+            </div>
+
+            <div class="metric-card metric-card--highlight">
+                <div class="metric-card__icon">💰</div>
+                <div class="metric-card__info">
+                    <span class="metric-card__label">Tổng giá trị tồn kho (đang lọc)</span>
+                    <strong class="metric-card__value">{{ formatCurrency(totalDisplayedInventoryValue) }}</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== MAIN CONTENT SPLIT LAYOUT ===== -->
+        <div class="content-grid">
+            <!-- ===== LEFT COLUMN: PRODUCT TABLE AND CONTROLS ===== -->
+            <section class="main-panel">
+                <!-- TOOLBAR: SEARCH, CATEGORY FILTER AND PRICE SORT -->
+                <div class="toolbar">
+                    <div class="toolbar-item search-box">
+                        <label for="search-input" class="toolbar-label">Tìm kiếm tên:</label>
+                        <input id="search-input"
+                               type="text"
+                               class="form-input"
+                               placeholder="Gõ tên sản phẩm..."
+                               v-model.trim="searchKeyword">
+                    </div>
+
+                    <div class="toolbar-item">
+                        <label for="category-select" class="toolbar-label">Danh mục:</label>
+                        <select id="category-select" class="form-select" v-model="selectedCategory">
+                            <option value="ALL">Tất cả danh mục</option>
+                            <option v-for="cat in categoryList" :key="cat" :value="cat">
+                                {{ cat }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="toolbar-item">
+                        <label for="sort-select" class="toolbar-label">Sắp xếp giá:</label>
+                        <select id="sort-select" class="form-select" v-model="selectedSortOrder">
+                            <option value="DEFAULT">Mặc định</option>
+                            <option value="ASC">Giá tăng dần ↑</option>
+                            <option value="DESC">Giá giảm dần ↓</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="search-notice" v-if="searchWarningMessage" role="alert">
+                    <span class="search-notice__icon">ℹ️</span>
+                    <span>{{ searchWarningMessage }}</span>
+                </div>
+
+                <div class="table-container">
+                    <table class="product-table">
+                        <thead>
+                            <tr>
+                                <th>Mã sản phẩm</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Danh mục</th>
+                                <th class="text-right">Đơn giá</th>
+                                <th class="text-center">Tồn kho</th>
+                                <th class="text-right">Giá trị tồn</th>
+                                <th class="text-center">Trạng thái</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody v-if="filteredProducts.length > 0">
+                            <tr v-for="product in filteredProducts" :key="product.id">
+                                <td class="font-mono text-muted">#{{ product.id }}</td>
+                                <td class="font-semibold">{{ product.name }}</td>
+                                <td>
+                                    <span class="category-chip">{{ product.category }}</span>
+                                </td>
+                                <td class="text-right font-mono">{{ formatCurrency(product.price) }}</td>
+                                <td class="text-center font-bold" :class="{ 'text-danger': product.stock === 0 }">
+                                    {{ product.stock }}
+                                </td>
+                                <td class="text-right font-mono text-primary">
+                                    {{ formatCurrency(calculateItemInventoryValue(product)) }}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge" :class="isProductInStock(product) ? 'badge--success' : 'badge--danger'">
+                                        {{ isProductInStock(product) ? 'Còn hàng' : 'Hết hàng' }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button"
+                                            class="btn-icon btn-icon--danger"
+                                            @click="confirmAndDeleteProduct(product)"
+                                            :title="'Xóa sản phẩm ' + product.name">
+                                        🗑️
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Empty state notification when filter yields no items -->
+                    <div class="empty-state" v-if="filteredProducts.length === 0">
+                        <div class="empty-state__icon">🔍</div>
+                        <p class="empty-state__title">Không tìm thấy sản phẩm phù hợp</p>
+                        <p class="empty-state__subtitle">Hãy thử thay đổi từ khóa tìm kiếm hoặc bỏ chọn bộ lọc danh mục.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== RIGHT COLUMN: ADD NEW PRODUCT FORM ===== -->
+            <aside class="sidebar-panel">
+                <div class="card form-card">
+                    <header class="form-card__header">
+                        <h2 class="form-card__title">Thêm sản phẩm mới</h2>
+                        <p class="form-card__subtitle">Bổ sung mặt hàng vào hệ thống kho</p>
+                    </header>
+
+                    <form novalidate @submit.prevent="handleCreateProduct">
+                        <!-- Product name input -->
+                        <div class="form-group">
+                            <label for="new-product-name" class="form-label">Tên sản phẩm <span class="required">*</span></label>
+                            <input id="new-product-name"
+                                   type="text"
+                                   class="form-input"
+                                   placeholder="Ví dụ: Bàn phím cơ không dây"
+                                   v-model.trim="newProduct.name">
+                        </div>
+
+                        <!-- Category selection -->
+                        <div class="form-group">
+                            <label for="new-product-category" class="form-label">Danh mục <span class="required">*</span></label>
+                            <select id="new-product-category" class="form-select" v-model="newProduct.category">
+                                <option v-for="cat in categoryList" :key="cat" :value="cat">{{ cat }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Price input (must be > 0) -->
+                        <div class="form-group">
+                            <label for="new-product-price" class="form-label">Đơn giá (VNĐ) <span class="required">*</span></label>
+                            <input id="new-product-price"
+                                   type="number"
+                                   min="1"
+                                   step="any"
+                                   class="form-input"
+                                   placeholder="Giá > 0"
+                                   v-model.number="newProduct.price">
+                        </div>
+
+                        <!-- Stock input (must be non-negative integer >= 0) -->
+                        <div class="form-group">
+                            <label for="new-product-stock" class="form-label">Số lượng tồn kho <span class="required">*</span></label>
+                            <input id="new-product-stock"
+                                   type="number"
+                                   min="0"
+                                   step="1"
+                                   class="form-input"
+                                   placeholder="Số nguyên >= 0"
+                                   v-model.number="newProduct.stock">
+                        </div>
+
+                        <!-- Validation error alert -->
+                        <div class="form-error-alert" v-if="formErrorMessage">
+                            ⚠️ {{ formErrorMessage }}
+                        </div>
+
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn--primary btn--full" :disabled="!isFormSubmittable">
+                            + Thêm vào giỏ hàng
+                        </button>
+                    </form>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Application script -->
+    <script src="assets/js/product_list_statistics.js"></script>
+</body>
+</html>

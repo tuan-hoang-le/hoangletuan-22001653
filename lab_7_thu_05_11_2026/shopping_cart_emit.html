@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping cart with props and $emit</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="assets/css/shopping_cart_emit.css">
+
+    <!-- Load local Vue.js with CDN fallback for offline/online reliability -->
+    <script src="assets/js/vue.global.js"></script>
+    <script>
+        if (!window.Vue) {
+            document.write('<script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <div id="app" class="cart-layout">
+        <!-- ===== CART PAGE HEADER ===== -->
+        <header class="cart-header">
+            <h1 class="cart-header__title">Giỏ hàng của bạn</h1>
+            <p class="cart-header__subtitle">
+                Hiện thực luồng dữ liệu một chiều và giao tiếp Component bằng $emit
+            </p>
+        </header>
+
+        <!-- ===== MAIN CART CONTENT ===== -->
+        <div class="cart-grid">
+            <!-- LEFT COLUMN: CART ITEMS LIST -->
+            <section class="cart-items-section" aria-label="Cart items container">
+                <!-- Table header bar -->
+                <div class="items-table-header" v-if="cartItems.length > 0">
+                    <span class="col-product">Sản phẩm</span>
+                    <span class="col-price">Đơn giá</span>
+                    <span class="col-quantity">Số lượng (1 - 99)</span>
+                    <span class="col-subtotal">Thành tiền</span>
+                    <span class="col-action">Xóa</span>
+                </div>
+
+                <div class="cart-items-list" v-if="cartItems.length > 0">
+                    <cart-item
+                        v-for="item in cartItems"
+                        :key="item.id"
+                        :id="item.id"
+                        :name="item.name"
+                        :price="item.price"
+                        :quantity="item.quantity"
+                        @change-quantity="handleQuantityChange"
+                        @remove-item="handleDeleteRequest">
+                    </cart-item>
+                </div>
+
+                <div class="empty-cart-state" v-else role="status" aria-live="polite">
+                    <div class="empty-cart-state__icon">🛒</div>
+                    <h2 class="empty-cart-state__title">Giỏ hàng trống</h2>
+                    <p class="empty-cart-state__desc">Không có sản phẩm nào trong giỏ hàng của bạn.</p>
+                    <button type="button" class="btn btn--secondary" @click="restoreDefaultItems">
+                        Khôi phục đơn hàng mẫu
+                    </button>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: ORDER SUMMARY CARD -->
+            <aside class="cart-summary-section" aria-label="Order summary breakdown">
+                <div class="summary-card">
+                    <h2 class="summary-card__title">Tóm tắt đơn hàng</h2>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Tổng số lượng:</span>
+                        <strong class="summary-value">{{ totalQuantity }} món</strong>
+                    </div>
+
+                    <div class="summary-row">
+                        <span class="summary-label">Phí vận chuyển:</span>
+                        <span class="summary-value text-success">Miễn phí</span>
+                    </div>
+
+                    <hr class="summary-divider">
+
+                    <div class="summary-row summary-row--total">
+                        <span class="summary-label">Tổng tiền thanh toán:</span>
+                        <strong class="total-price">{{ formatCurrency(totalPrice) }}</strong>
+                    </div>
+
+                    <div class="summary-actions">
+                        <button type="button" 
+                                class="btn btn--primary btn--full" 
+                                :disabled="cartItems.length === 0"
+                                @click="handleCheckout">
+                            Tiến hành thanh toán
+                        </button>
+                        
+                        <button type="button" 
+                                class="btn btn--outline btn--full" 
+                                v-if="cartItems.length > 0"
+                                @click="clearEntireCart">
+                            Xóa toàn bộ giỏ hàng
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script src="components/CartItem.js"></script>
+    <script src="assets/js/shopping_cart_emit.js"></script>
+</body>
+</html>
