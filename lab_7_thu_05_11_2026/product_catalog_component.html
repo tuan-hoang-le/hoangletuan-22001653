@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product catalog with component</title>
+
+    <!-- External stylesheet -->
+    <link rel="stylesheet" href="assets/css/product_catalog_component.css">
+
+    <!-- Load local Vue.js with CDN fallback for offline/online reliability -->
+    <script src="assets/js/vue.global.js"></script>
+    <script>
+        if (!window.Vue) {
+            document.write('<script src="https://unpkg.com/vue@3/dist/vue.global.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <div id="app" class="catalog-layout">
+        <!-- ===== CATALOG HEADER ===== -->
+        <header class="catalog-header">
+            <div class="header-badge">Bộ sưu tập công nghệ</div>
+            <h1 class="header-title">Danh mục sản phẩm thông minh</h1>
+            <p class="header-subtitle">
+                Trải nghiệm ứng dụng kiến trúc Component độc lập trong Vue 3 với props và dữ liệu cục bộ.
+            </p>
+        </header>
+
+        <!-- ===== PRODUCT CARDS GRID ===== -->
+        <main class="products-grid">
+            <product-card
+                v-for="product in products"
+                :key="product.id"
+                :name="product.name"
+                :price="product.price"
+                :image="product.image"
+                :description="product.description"
+                :stock="product.stock"
+                @buy="handleProductBuy">
+            </product-card>
+        </main>
+
+        <!-- Toast notification feedback when an item is purchased -->
+        <div class="toast-notification" v-if="notificationMessage" role="alert">
+            <span>✓ {{ notificationMessage }}</span>
+        </div>
+    </div>
+
+    <script src="components/ProductCard.js"></script>
+    <script src="assets/js/product_catalog_component.js"></script>
+</body>
+</html>
