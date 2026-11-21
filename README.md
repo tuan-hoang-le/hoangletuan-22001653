@@ -92,6 +92,19 @@ root
 │   │   └── vue.global.js                     # Thư viện Vue.js 3 bản độc lập (global build) phục vụ chạy ngoại tuyến (offline).
 │   ├── index.html                            # Giao diện ứng dụng Quản lý sản phẩm tích hợp Vue.js, hiển thị bảng sản phẩm (v-for) và biểu mẫu thêm/sửa linh hoạt.
 │   └── product_management.sql                # Kịch bản SQL tạo cơ sở dữ liệu product_management, bảng products (ràng buộc CHECK) và chèn dữ liệu mẫu ban đầu.
+├── lab_9_thu_19_11_2026/
+│   ├── api/
+│   │   ├── products.php                      # RESTful API hỗ trợ CRUD sản phẩm kết hợp phân trang ở Backend (LIMIT, OFFSET, đếm tổng bản ghi và tính tổng số trang).
+│   │   └── upload.php                        # API xử lý tải ảnh sản phẩm (POST multipart/form-data), kiểm tra dung lượng (<= 2 MB), MIME thực tế (finfo) và lưu vào uploads/.
+│   ├── config/
+│   │   └── Database.php                      # Lớp quản lý kết nối cơ sở dữ liệu MySQL bằng PDO theo mô hình singleton, cấu hình UTF-8 và bắt lỗi PDOException.
+│   ├── css/
+│   │   └── style.css                         # Định dạng giao diện quản lý sản phẩm: Khung xem trước ảnh (preview), ảnh thu nhỏ (thumbnail), bảng dữ liệu và thanh phân trang.
+│   ├── js/
+│   │   ├── app.js                            # Xử lý logic Vue.js 3: Kiểm tra và tải ảnh bằng FormData, xem trước ảnh, cho phép thử lại khi lỗi và điều hướng phân trang động.
+│   │   └── vue.global.js                     # Thư viện Vue.js 3 bản độc lập (global build) phục vụ chạy ngoại tuyến (offline).
+│   ├── index.html                            # Giao diện ứng dụng Quản lý sản phẩm tích hợp Vue.js với ô chọn ảnh, khung xem trước, cột ảnh thu nhỏ và thanh chuyển trang.
+│   └── product_management.sql                # Kịch bản SQL bổ sung cột image (VARCHAR(255) NULL) vào bảng products và chèn thêm 9 bản ghi mẫu phục vụ kiểm thử phân trang.
 └── midterm/
     ├── problem_1_student_grading.php         # Giải quyết bài 1 trong đề thi giữa kỳ: Xếp loại học lực học sinh theo thang điểm bằng class Student và câu lệnh điều kiện.
     └── problem_2_product_pricing.php         # Giải quyết bài 2 trong đề thi giữa kỳ: Quản lý mảng giá sản phẩm, tính tổng giá trị và tìm giá cao nhất bằng class ProductPriceManager.

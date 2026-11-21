@@ -2,6 +2,10 @@
 problems/
 draft.txt
 
+# Runtime uploaded files & local sample test images
+**/uploads/
+**/images/
+
 # Operating System files
 .DS_Store
 Thumbs.db
